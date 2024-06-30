@@ -2,9 +2,9 @@ const net = require("net");
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
+    console.log(data);
     const request = data.toString();
     const requestParts = request.split(" ");
-    console.log(requestParts);
     const url = requestParts[1];
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
 
