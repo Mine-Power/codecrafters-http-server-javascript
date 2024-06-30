@@ -5,26 +5,28 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = data.toString();
     const headers = request.split("\r\n");
-    const url = headers[0].split(" ")[1];
     const method = headers[0].split(" ")[0];
+    const path = headers[0].split(" ")[1];
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
+    // Debug
+    console.log(headers);
 
-    if (url == "/") {
+    if (path == "/") {
       httpResponse = "HTTP/1.1 200 OK\r\n\r\n";
     }
 
-    if (url.includes("/echo/")) {
-      const requestString = url.split("/echo/")[1];
+    if (path.includes("/echo/")) {
+      const requestString = path.split("/echo/")[1];
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${requestString.length}\r\n\r\n${requestString}`;
     }
 
-    if (url.includes("/user-agent")) {
+    if (path.includes("/user-agent")) {
       const userAgent = headers[2].split('User-Agent: ')[1];
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
     }
 
-    if (url.includes("/files/")) {
-      const fileName = url.split("/files/")[1];
+    if (path.includes("/files/")) {
+      const fileName = path.split("/files/")[1];
       const directory = process.argv[3];
       switch (method) {
         case "GET":
