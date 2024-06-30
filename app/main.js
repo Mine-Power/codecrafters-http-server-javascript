@@ -3,9 +3,10 @@ var fs = require('fs');
 
 const readHeaders = (data) => {
   const response = data.toString().split("\r\n");
+  console.log(response);
   const method = response[0].split(" ")[0];
   const path = response[0].split(" ")[1];
-  const body = response[-1];
+  const body = null;
   return [
     method,
     path,
@@ -54,8 +55,7 @@ const server = net.createServer((socket) => {
           }
           break;
         case "POST":
-          const content = headers[headers.length - 1];
-          fs.writeFileSync(`${directory}/${fileName}`, content);
+          fs.writeFileSync(`${directory}/${fileName}`, body);
           httpResponse = "HTTP/1.1 201 Created\r\n\r\n";
           break;
         default:
