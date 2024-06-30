@@ -21,6 +21,7 @@ const server = net.createServer((socket) => {
     }
     if (url.includes("/files/")) {
       const fileName = url.split("/files/")[1];
+      console.log(fileName);
       const directory = process.argv[3];
       if (fs.existsSync(`${directory}/${fileName}`)) {
         const content = fs.readFileSync(`${directory}/${fileName}`).toString();
