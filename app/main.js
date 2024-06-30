@@ -16,7 +16,7 @@ const readHeaders = (data) => {
 const writeMessage = (socket, resStatus, resHeaders = [], body = "") => {
   const resHeaderStrs = resHeaders.map((header) => `${header[0]}: ${header[1]}`);
   const res = [`${RES_START} ${resStatus}`, ...resHeaderStrs];
-  socket.write(res.join("\r\n"));
+  socket.write(`${res.join("\r\n")}\r\n\r\n`);
   socket.write(body);
 }
 
