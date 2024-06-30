@@ -21,6 +21,7 @@ const server = net.createServer((socket) => {
     if (url.includes("/files/")) {
       const requestedFile = url.split("/echo/")[1];
       const returnedFile = `${__dirname}/tmp/${requestedFile}`;
+      console.log(returnedFile);
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${returnedFile.toString().length}\r\n\r\n${returnedFile.toString()}`
     }
 
