@@ -20,10 +20,12 @@ const server = net.createServer((socket) => {
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
     }
     if (url.includes("/files/")) {
-      const requestedFile = url.split("/files/")[1];
-      const fileStream = fs.readFileSync(`${__dirname}/tmp/${requestedFile}`);
-      console.log(fileStream);
-      httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileStream.toString().length}\r\n\r\n${fileStream.toString()}`
+      const fileName = url.split("/files/")[1];
+      const directory = process.argv[3];
+      if (fs.existsSync(`${directory}/${fileName}`)) {
+        const content = fs.readFileSync(`${directory}/${fileName}`).toString();
+        httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${content}\r\n\r\n${content}`
+      }
     }
 
     socket.write(httpResponse);
