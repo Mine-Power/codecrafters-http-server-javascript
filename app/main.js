@@ -1,12 +1,20 @@
 const net = require("net");
 var fs = require('fs');
 
+const readHeaders = (data) => {
+  const headers = data.toString().split("\r\n");
+  const method = headers[0].split(" ")[0];
+  const path = headers[0].split(" ")[1];
+  return [
+    method,
+    path,
+    Object.fromEntries(headers.slice(1, -2).map((header) => [header.split(": ")[0], header.split(": ")[1]]))
+  ];
+};
+
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    const request = data.toString();
-    const headers = request.split("\r\n");
-    const method = headers[0].split(" ")[0];
-    const path = headers[0].split(" ")[1];
+    const [method, path, headers] = readHeaders(data);
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
     // Debug
     console.log(headers);
@@ -18,8 +26,8 @@ const server = net.createServer((socket) => {
     if (path.includes("/echo/")) {
       const requestString = path.split("/echo/")[1];
       let encodingString = "";
-      if (headers[3].length != 0) {
-        const encoding = headers[3].split("Accept-Encoding: ")[1];
+      if (headers["Accept-Encoding"] != null) {
+        const encoding = headers["Accept-Encoding"];
         console.log(encoding);
         if (encoding === "gzip") {
           encodingString = `\r\nContent-Encoding: ${encoding}`
