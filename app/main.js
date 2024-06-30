@@ -11,7 +11,7 @@ const server = net.createServer((socket) => {
     if (url == "/") {
       httpResponse = "HTTP/1.1 200 OK\r\n\r\n";
     }
-    if (url.includes("/echo/")) {
+    if (url.includes("/echo")) {
       const requestString = url.split("/echo/")[1];
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${requestString.length}\r\n\r\n${requestString}`;
     }
@@ -19,7 +19,7 @@ const server = net.createServer((socket) => {
       const userAgent = headers[2].split('User-Agent: ')[1];
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
     }
-    if (url.includes("/files/")) {
+    if (url.includes("/files")) {
       const fileName = url.split("/files/")[1];
       console.log(fileName);
       const directory = process.argv[3];
