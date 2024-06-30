@@ -3,10 +3,9 @@ var fs = require('fs');
 
 const readHeaders = (data) => {
   const response = data.toString().split("\r\n");
-  console.log(response);
   const method = response[0].split(" ")[0];
   const path = response[0].split(" ")[1];
-  const body = null;
+  const body = response[response.length - 1];
   return [
     method,
     path,
