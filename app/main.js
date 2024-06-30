@@ -2,10 +2,9 @@ const net = require("net");
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    console.log(data);
     const request = data.toString();
-    const requestParts = request.split(" ");
-    const url = requestParts[1];
+    const url = request.split(" ")[1];
+    const headers = request.split("\r\n");
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
 
     if (url == "/") {
@@ -16,7 +15,7 @@ const server = net.createServer((socket) => {
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${requestString.length}\r\n\r\n${requestString}`;
     }
     if (url.includes("/user-agent")) {
-      const userAgent = requestParts[5];
+      const userAgent = headers[2].split('User-Agent: ')[1];
       httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
     }
 
