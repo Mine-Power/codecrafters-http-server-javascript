@@ -20,6 +20,7 @@ const server = net.createServer((socket) => {
       let encodingString = "";
       if (headers[3].length != 0) {
         const encoding = headers[3].split("Accept-Encoding: ")[1];
+        console.log(encoding);
         if (encoding === "gzip") {
           encodingString = `\r\nContent-Encoding: ${encoding}`
         }
