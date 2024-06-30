@@ -3,7 +3,7 @@ const net = require("net");
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = data.toString();
-    if (request.startsWith("GET /")) {
+    if (request.startsWith("GET / ")) {
       const httpResponse = "HTTP/1.1 200 OK\r\n\r\n";
       socket.write(httpResponse);
       return;
