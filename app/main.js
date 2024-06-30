@@ -1,4 +1,5 @@
 const net = require("net");
+var fs = require('fs');
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
@@ -20,9 +21,9 @@ const server = net.createServer((socket) => {
     }
     if (url.includes("/files/")) {
       const requestedFile = url.split("/files/")[1];
-      const returnedFile = `${__dirname}/tmp/${requestedFile}`;
-      console.log(returnedFile);
-      httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${returnedFile.toString().length}\r\n\r\n${returnedFile.toString()}`
+      const fileStream = fs.readFileSync(`${__dirname}/tmp/${requestedFile}`);
+      console.log(fileStream);
+      httpResponse = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileStream.toString().length}\r\n\r\n${fileStream.toString()}`
     }
 
     socket.write(httpResponse);
