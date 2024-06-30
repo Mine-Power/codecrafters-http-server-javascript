@@ -2,22 +2,24 @@ const net = require("net");
 var fs = require('fs');
 
 const readHeaders = (data) => {
-  const headers = data.toString().split("\r\n");
-  const method = headers[0].split(" ")[0];
-  const path = headers[0].split(" ")[1];
+  const response = data.toString().split("\r\n");
+  const method = response[0].split(" ")[0];
+  const path = response[0].split(" ")[1];
+  const body = response[-1];
   return [
     method,
     path,
-    Object.fromEntries(headers.slice(1, -2).map((header) => [header.split(": ")[0], header.split(": ")[1]]))
+    Object.fromEntries(response.slice(1, -2).map((header) => [header.split(": ")[0], header.split(": ")[1]])),
+    body
   ];
 };
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    const [method, path, headers] = readHeaders(data);
+    const [method, path, headers, body] = readHeaders(data);
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
     // Debug
-    console.log(headers);
+    console.log(method, path, headers, body);
 
     if (path == "/") {
       httpResponse = "HTTP/1.1 200 OK\r\n\r\n";
