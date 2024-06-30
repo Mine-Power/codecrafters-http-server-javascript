@@ -1,5 +1,6 @@
 const net = require("net");
-var fs = require('fs');
+const fs = require("fs");
+const zlib = require("zlib");
 
 const readHeaders = (data) => {
   const response = data.toString().split("\r\n");
@@ -26,17 +27,18 @@ const server = net.createServer((socket) => {
     }
 
     if (path.includes("/echo/")) {
-      const requestString = path.split("/echo/")[1];
+      const content = path.split("/echo/")[1];
       let encodingString = "";
       if (headers["Accept-Encoding"] != null) {
         const encodings = headers["Accept-Encoding"].split(", ");
         encodings.forEach((encoding) => {
           if (encoding === "gzip") {
             encodingString = `\r\nContent-Encoding: ${encoding}`;
+            content = zlib.gzipSync(content);
           }
         })
       }
-      httpResponse = `HTTP/1.1 200 OK${encodingString}\r\nContent-Type: text/plain\r\nContent-Length: ${requestString.length}\r\n\r\n${requestString}`;
+      httpResponse = `HTTP/1.1 200 OK${encodingString}\r\nContent-Type: text/plain\r\nContent-Length: ${content.length}\r\n\r\n${content}`;
     }
 
     if (path.includes("/user-agent")) {
