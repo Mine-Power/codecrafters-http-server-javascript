@@ -29,11 +29,12 @@ const server = net.createServer((socket) => {
       const requestString = path.split("/echo/")[1];
       let encodingString = "";
       if (headers["Accept-Encoding"] != null) {
-        const encoding = headers["Accept-Encoding"];
-        console.log(encoding);
-        if (encoding === "gzip") {
-          encodingString = `\r\nContent-Encoding: ${encoding}`
-        }
+        const encodings = headers["Accept-Encoding"].split(", ");
+        encodings.forEach((encoding) => {
+          if (encoding === "gzip") {
+            encodingString = `\r\nContent-Encoding: ${encoding}`;
+          }
+        })
       }
       httpResponse = `HTTP/1.1 200 OK${encodingString}\r\nContent-Type: text/plain\r\nContent-Length: ${requestString.length}\r\n\r\n${requestString}`;
     }
