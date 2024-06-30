@@ -52,8 +52,8 @@ const handleData = (socket, data) => {
   if (path.includes("/user-agent")) {
     const userAgent = headers["User-Agent"];
     writeMessage(socket, "200 OK", [
-      "Content-Type", "text/plain",
-      "Content-Length", userAgent.length,
+      ["Content-Type", "text/plain"],
+      ["Content-Length", userAgent.length],
     ], userAgent);
     return;
   }
@@ -66,8 +66,8 @@ const handleData = (socket, data) => {
         if (fs.existsSync(`${directory}/${fileName}`)) {
           const content = fs.readFileSync(`${directory}/${fileName}`).toString();
           writeMessage(socket, "200 OK", [
-            "Content-Type", "application/octet-stream",
-            "Content-Length", content.length
+            ["Content-Type", "application/octet-stream"],
+            ["Content-Length", content.length]
           ], content)
         }
         break;
