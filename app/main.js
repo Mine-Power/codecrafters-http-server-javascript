@@ -7,8 +7,6 @@ const server = net.createServer((socket) => {
     const headers = request.split("\r\n");
     const url = headers[0].split(" ")[1];
     const method = headers[0].split(" ")[0];
-    console.log(url);
-    console.log(method);
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
 
     if (url == "/") {
