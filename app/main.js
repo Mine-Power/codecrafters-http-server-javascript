@@ -4,9 +4,9 @@ var fs = require('fs');
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = data.toString();
-    const url = request.split(" ")[1];
-    const method = request.split(" ")[0];
     const headers = request.split("\r\n");
+    const url = headers[0].split(" ")[1];
+    const method = headers[0].split(" ")[0];
     let httpResponse = "HTTP/1.1 404 Not Found\r\n\r\n";
 
     if (url == "/") {
