@@ -69,6 +69,8 @@ const handleData = (socket, data) => {
             ["Content-Type", "application/octet-stream"],
             ["Content-Length", content.length]
           ], content)
+        } else {
+          writeMessage(socket, "404 Not Found");
         }
         break;
       case "POST":
@@ -80,7 +82,7 @@ const handleData = (socket, data) => {
     return;
   }
 
-  writeMessage(socket, "404 NOT FOUND");
+  writeMessage(socket, "404 Not Found");
 };
 
 const server = net.createServer((socket) => {
