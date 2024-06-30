@@ -27,7 +27,7 @@ const server = net.createServer((socket) => {
     }
 
     if (path.includes("/echo/")) {
-      const content = path.split("/echo/")[1];
+      let content = path.split("/echo/")[1];
       let encodingString = "";
       if (headers["Accept-Encoding"] != null) {
         const encodings = headers["Accept-Encoding"].split(", ");
