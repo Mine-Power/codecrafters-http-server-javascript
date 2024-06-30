@@ -3,6 +3,7 @@ const fs = require("fs");
 const zlib = require("zlib");
 
 const RES_START = "HTTP/1.1";
+const DIRECTORY = process.argv[3];
 
 const readHeaders = (data) => {
   const req = data.toString().split("\r\n");
@@ -20,51 +21,42 @@ const writeMessage = (socket, resStatus, resHeaders = [], body = "") => {
   socket.write(body);
 }
 
-const handleData = (socket, data) => {
-  const [method, path, headers, body] = readHeaders(data);
-  // Debug
-  console.log(method, path, headers, body);
+const handleIndex = (socket) => {
+  writeMessage(socket, "200 OK");
+};
 
-  if (path == "/") {
-    writeMessage(socket, "200 OK");
-    return;
+const handleUserAgent = (socket, headers) => {
+  const userAgent = headers["User-Agent"];
+  writeMessage(socket, "200 OK", [
+    ["Content-Type", "text/plain"],
+    ["Content-Length", userAgent.length],
+  ], userAgent);
+};
+
+const handleEcho = (socket, path, headers) => {
+  let content = path.split("/echo/")[1];
+  const resHeaders = [
+    ["Content-Type", "text/plain"]
+  ];
+  if (headers["Accept-Encoding"] != null) {
+    const encodings = headers["Accept-Encoding"].split(", ");
+    encodings.forEach((encoding) => {
+      if (encoding === "gzip") {
+        resHeaders.push(["Content-Encoding", encoding]);
+        content = zlib.gzipSync(content);
+      }
+    })
   }
+  resHeaders.push(["Content-Length", content.length]);
+  writeMessage(socket, "200 OK", resHeaders, content);
+}
 
-  if (path.includes("/echo/")) {
-    let content = path.split("/echo/")[1];
-    const resHeaders = [
-      ["Content-Type", "text/plain"]
-    ];
-    if (headers["Accept-Encoding"] != null) {
-      const encodings = headers["Accept-Encoding"].split(", ");
-      encodings.forEach((encoding) => {
-        if (encoding === "gzip") {
-          resHeaders.push(["Content-Encoding", encoding]);
-          content = zlib.gzipSync(content);
-        }
-      })
-    }
-    resHeaders.push(["Content-Length", content.length]);
-    writeMessage(socket, "200 OK", resHeaders, content);
-    return;
-  }
-
-  if (path.includes("/user-agent")) {
-    const userAgent = headers["User-Agent"];
-    writeMessage(socket, "200 OK", [
-      ["Content-Type", "text/plain"],
-      ["Content-Length", userAgent.length],
-    ], userAgent);
-    return;
-  }
-
-  if (path.includes("/files/")) {
-    const fileName = path.split("/files/")[1];
-    const directory = process.argv[3];
+const handleFiles = (socket, path, method) => {
+  const fileName = path.split("/files/")[1];
     switch (method) {
       case "GET":
-        if (fs.existsSync(`${directory}/${fileName}`)) {
-          const content = fs.readFileSync(`${directory}/${fileName}`).toString();
+        if (fs.existsSync(`${DIRECTORY}/${fileName}`)) {
+          const content = fs.readFileSync(`${DIRECTORY}/${fileName}`).toString();
           writeMessage(socket, "200 OK", [
             ["Content-Type", "application/octet-stream"],
             ["Content-Length", content.length]
@@ -74,12 +66,36 @@ const handleData = (socket, data) => {
         }
         break;
       case "POST":
-        fs.writeFileSync(`${directory}/${fileName}`, body);
+        fs.writeFileSync(`${DIRECTORY}/${fileName}`, body);
         writeMessage(socket, "201 Created");
         break;
       default:
+        writeMessage(socket, "404 Not Found");
     }
+};
+
+const handleData = (socket, data) => {
+  const [method, path, headers, body] = readHeaders(data);
+  // Debug
+  console.log(method, path, headers, body);
+
+  if (path == "/") {
+    handleIndex(socket);
     return;
+  }
+
+  if (path.includes("/echo/")) {
+    handleEcho(socket, path, headers);
+    return;
+  }
+
+  if (path.includes("/user-agent")) {
+    handleUserAgent(socket, headers);
+    return;
+  }
+
+  if (path.includes("/files/")) {
+    handleFiles(socket, path, method);
   }
 
   writeMessage(socket, "404 Not Found");
